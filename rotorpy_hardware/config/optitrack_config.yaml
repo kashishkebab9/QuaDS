@@ -1,0 +1,26 @@
+#
+# Definition of all trackable objects
+# Identifier corresponds to Trackable ID set in Tracking Tools
+#
+rigid_bodies:
+    '4':
+        pose: crazy07/pose
+        pose2d: crazy07/2d
+        odom: crazy07/odom
+        marker: crazy07/markers
+        tf: tf
+        child_frame_id: crazy07
+        parent_frame_id: mocap
+    '5':
+        pose: box0/pose
+        pose2d: box0/2d
+        odom: box0/odom
+        marker: box0/individual_marker_array
+        tf: tf
+        child_frame_id: box0
+        parent_frame_id: mocap
+optitrack_config:
+        multicast_address: 239.255.42.99
+        command_port: 1510
+        data_port: 1511
+        enable_optitrack: true
