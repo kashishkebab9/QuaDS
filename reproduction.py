@@ -3,7 +3,7 @@ from scipy.io import loadmat
 from scipy.stats import multivariate_normal
 
 # === Load the .mat file ===
-mat = loadmat(r'C:\Users\jackc\Documents\GitHub\HW3_MEAM6230\meam6230-hw\test_gmm.mat')  # Adjust path if needed
+mat = loadmat(r'./test_gmm.mat')  # Adjust path if needed
 print("Loaded keys:", list(mat.keys()))
 
 # === Extract GMM ===
