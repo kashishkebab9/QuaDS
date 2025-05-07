@@ -135,8 +135,6 @@ def process(bag_name):
     # }
 
     #cut half of the data, keep the first half
-
-
     cell_wrapped = np.empty((1, 1), dtype=object)
     cell_wrapped[0, 0] = subsampled_array.T
 

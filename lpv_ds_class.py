@@ -178,8 +178,6 @@ class LPV_DS_Model:
         plt.show()
 
 
-
-
 # === Example usage ===
 if __name__ == "__main__":
     model = LPV_DS_Model('./gmm.mat')
