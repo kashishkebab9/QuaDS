@@ -6,8 +6,6 @@ from scipy.stats import multivariate_normal
 class LPV_DS_Model:
     def __init__(self, mat_path):
         self.mat_data = loadmat(mat_path)
-
-
         # what is inside the mat file
         print(self.mat_data.keys())
 
@@ -15,7 +13,7 @@ class LPV_DS_Model:
         self._load_lpv_ds()
 
         self.Xi_dot_ref = self.mat_data['Xi_dot_ref']
-
+        self.Xi_ref = self.mat_data['Xi_ref']
 
         if 'x_test' in self.mat_data:
 
@@ -150,7 +148,7 @@ class LPV_DS_Model:
 
         # Grid for streamplot
         x_vals = np.linspace(-5, 5, 20)
-        y_vals = np.linspace(-20, 20, 40)
+        y_vals = np.linspace(-5, 10, 40)
         X, Y = np.meshgrid(x_vals, y_vals)
 
         U = np.zeros_like(X)
@@ -184,8 +182,9 @@ class LPV_DS_Model:
         #plot xi_ref
         print("xi_ref", self.Xi_dot_ref.shape)
 
-        for i in range(self.Xi_dot_ref.shape[1]):
-            xi_ref = self.Xi_dot_ref[:, i]
+        for i in range(self.Xi_ref.shape[1]):
+            xi_ref = self.Xi_ref[:, i]
+            print("xi_ref", xi_ref)
             ax.plot(xi_ref[0], xi_ref[1], 'bo', markersize=2)
 
 

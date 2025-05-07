@@ -89,14 +89,14 @@ tStart = cputime;
 % 1: GMM-EM Model Selection via BIC
 % 2: CRP-GMM (Collapsed Gibbs Sampler)
 est_options = [];
-est_options.type             = 2;   % GMM Estimation Algorithm Type 
+est_options.type             = 1;   % GMM Estimation Algorithm Type 
 
 % If algo 1 selected:
 est_options.maxK             = 15;  % Maximum Gaussians for Type 1
 est_options.fixed_K          = [];  % Fix K and estimate with EM for Type 1
 
 % If algo 0 or 2 selected:
-est_options.samplerIter      = 300;  % Maximum Sampler Iterations
+est_options.samplerIter      = 30;  % Maximum Sampler Iterations
                                     % For type 0: 20-50 iter is sufficient
                                     % For type 2: >100 iter are needed
                                     
@@ -328,6 +328,11 @@ figHandles = findall(0, 'Type', 'figure');
 % Get the current date and time as a st ring
 timestamp = datestr(now, 'yyyy-mm-dd_HH-MM-SS');
 
+save('gmm.mat');
+
+
+
+
 % Loop through each figure and save it
 for i = 1:length(figHandles)
     % Get the current figure handle
@@ -337,3 +342,6 @@ for i = 1:length(figHandles)
     % The timestamp is appended to the figure number
     saveas(fig, sprintf('figure_%d_%s.png', i, timestamp)); 
 end
+
+
+
