@@ -7,7 +7,7 @@ class LPV_DS_Model:
     def __init__(self, mat_path):
         self.mat_data = loadmat(mat_path)
         # what is inside the mat file
-        print(self.mat_data.keys())
+        #print(self.mat_data.keys())
 
         self._load_gmm()
         self._load_lpv_ds()

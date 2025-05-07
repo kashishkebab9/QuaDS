@@ -10,15 +10,25 @@ from lpv_ds_class import LPV_DS_Model
 
 
 class LPVDS_ROS_Node:
-    def __init__(self):
+    def __init__(self, gmm_path):
+
+
         rospy.init_node('lpvds_ros_node')
 
+        #print path
+        rospy.loginfo(f"Loading GMM from: {gmm_path}")
+
         # Load LPV-DS model
-        mat_path = rospy.get_param("~mat_path", "gmm.mat")
+        mat_path = rospy.get_param("~gmm", gmm_path)
         self.model = LPV_DS_Model(mat_path)
 
         self.latest_odom = None
         self.trigger_received = False
+
+        self.init_pos = np.array([[self.model.Xi_ref[0, 0]], [self.model.Xi_ref[1, 0]]])
+        #print("The initial position is ", self.init_pos)
+
+        print("The initial position is ", self.init_pos)
 
         # Subscribers
         rospy.Subscriber('/hummingbird/ground_truth/odometry', Odometry, self.odom_callback)
@@ -47,9 +57,14 @@ class LPVDS_ROS_Node:
 
         pos = self.latest_odom.pose.pose.position
         x = np.array([[pos.x], [pos.y]])
-        x_dot = self.model.evaluate_lpv_ds(x)
 
-        print("evaluate the x and the x_dot is ", x, x_dot)
+        relative_x = x + self.init_pos
+        x_dot = self.model.evaluate_lpv_ds(relative_x)
+
+        print("evaluate the x and the x_dot is ", relative_x, x_dot)
+
+        #clip the x_dot to be in the range of [-1, 1]
+        x_dot = np.clip(x_dot, -1, 1)
 
         # Build trajectory message
         traj_msg = MultiDOFJointTrajectory()
@@ -87,15 +102,22 @@ class LPVDS_ROS_Node:
 
     def run_loop(self):
         while not rospy.is_shutdown():
-            print("Waiting for trigger...")
+            #print("Waiting for trigger...")
             if self.trigger_received:
                 self.publish_command()
             self.rate.sleep()
-            rospy.loginfo("Shutting down LPV-DS ROS node.")
+        
+        
+        rospy.loginfo("Shutting down LPV-DS ROS node.")
 
 
 if __name__ == '__main__':
+
+    gmm_path = "gmm_mat_data/gmm_trajectory_dataline_backward.mat"
+    if not gmm_path.endswith('.mat'):
+        raise ValueError("The provided file is not a .mat file.")
+
     try:
-        LPVDS_ROS_Node()
+        LPVDS_ROS_Node(gmm_path)
     except rospy.ROSInterruptException:
         pass

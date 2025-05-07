@@ -49,6 +49,11 @@ def process(bag_name):
 
         #cut half of the data, keep the first half
         array = array[:array.shape[0] // 2]
+
+
+        # reparameter the velocity to make the final velocity to be 0, and it should be kinda smooth
+
+        new_vel_x = np.zeros(array.shape[0])
     
     if bag_name == "circle_twice":
 
