@@ -93,6 +93,11 @@ print(subsampled_array.shape)
 #     'data': subsampled_array.T  # Shape: (N, 4)
 # }
 
+#cut half of the data, keep the first half
+subsampled_array = subsampled_array[:len(subsampled_array)//2]
+print("subsampled_array shape ", subsampled_array.shape)
+
+
 
 cell_wrapped = np.empty((1, 1), dtype=object)
 cell_wrapped[0, 0] = subsampled_array.T
