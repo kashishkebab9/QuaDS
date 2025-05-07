@@ -1,15 +1,33 @@
 import rosbag
 
 # Replace with your actual bag file path
-bag_path = '2025-04-09-15-38-20.bag'
+bag_name = 'line_backward'
+
+bag_path = './bag/' + bag_name + '.bag'
 
 import numpy as np
 
 # Open the bag file
-bag = rosbag.Bag(bag_path)
+if not bag_path.endswith('.bag'):
+    raise ValueError("The provided file is not a .bag file.")
+    
+bag = rosbag.Bag(bag_path, 'r')
 
-# Target topic
+#list all topics
+
+# if any of the topic has "/odom" in it, save to topic_name
 topic_name = '/vicon/lcarr_quad/odom'
+print("Topics in the bag file:")
+for topic in bag.get_type_and_topic_info()[1].keys():
+    print(topic)
+
+    if "/odom" in topic:
+        topic_name = topic
+        print("Found odom topic: ", topic_name)
+        break
+    else:
+        print("No odom topic found, using default: ", topic_name)
+
 
 # Prepare list to collect data
 data = []
@@ -72,6 +90,8 @@ plt.ylim(0, 10)
 #plt.tight_layout()
 plt.show()
 
+# save this image
+plt.savefig('trajectory_plot' + bag_name + '.png', dpi=300)
 
 from scipy.io import savemat
 import numpy as np
@@ -103,9 +123,9 @@ cell_wrapped = np.empty((1, 1), dtype=object)
 cell_wrapped[0, 0] = subsampled_array.T
 
 # Save to .mat file
-savemat('trajectory_data.mat', {'data': cell_wrapped})
+savemat('trajectory_data' + bag_name + '.mat', {'data': cell_wrapped})
 
 print("Saved matrix as a single cell to trajectory_data.mat")
 
-print("Saved to trajectory_data.mat")
+print("Saved to trajectory_data" + bag_name + ".mat")
 

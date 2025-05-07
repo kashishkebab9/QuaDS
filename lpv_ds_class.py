@@ -81,31 +81,6 @@ class LPV_DS_Model:
         print("Python x_dot:", x_dot_python)
         print("Difference:", np.abs(self.x_dot_matlab - x_dot_python))
 
-    
-    def visualize_lpv_ds(self):
-        import matplotlib.pyplot as plt
-        from mpl_toolkits.mplot3d import Axes3D
-
-        fig = plt.figure()
-        
-        # sample some data points x. and compute x_dot
-
-        range_x = np.linspace(-5, 5, 100)
-        range_y = np.linspace(-20, 20, 100)
-
-        for i in range(len(range_x)):
-            for j in range(len(range_y)):
-                x = np.array([[range_x[i]], [range_y[j]]])
-                x_dot = self.evaluate_lpv_ds(x)
-                plt.quiver(x[0], x[1], x_dot[0], x_dot[1], angles='xy', scale_units='xy', scale=1, color='r')
-        plt.xlim(-5, 5)
-        plt.ylim(-20, 20)
-        plt.xlabel('x1')
-        plt.ylabel('x2')
-        plt.title('LPV-DS Vector Field')
-        plt.grid()
-        plt.show()
-
 
     def visualize_lpv_streamplot(self):
         import numpy as np
@@ -130,6 +105,11 @@ class LPV_DS_Model:
         # Plot the streamlines
         plt.figure(figsize=(6, 6))
         plt.streamplot(X, Y, U, V, color='black', linewidth=1)
+
+        #plot the xi_ref
+        for i in range(self.Xi_ref.shape[1]):
+            xi_ref = self.Xi_ref[:, i]
+            plt.plot(xi_ref[0], xi_ref[1], 'bo', markersize=2)
 
         # Axis labels with LaTeX
         plt.xlabel(r'$x_1$', fontsize=18)
