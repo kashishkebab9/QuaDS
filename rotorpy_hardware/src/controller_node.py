@@ -35,6 +35,7 @@ from rotorpy.trajectories.lissajous_traj import TwoDLissajous
 from rotorpy.trajectories.speed_traj import ConstantSpeed
 from rotorpy.trajectories.minsnap import MinSnap
 from rotorpy.world import World
+from lpv_ds_class import LPV_DS_Model
 
 # Relative imports
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -75,6 +76,8 @@ class ControlCrazyflie:
         self.student_in_control = True
         self.failed = False
         self.traj_initialization()
+
+        self.lpvds = LPV_DS_Model("./gmm.mat")
         
         try:
             if hasattr(self.controller, "obstacles"):
@@ -149,9 +152,9 @@ class ControlCrazyflie:
         return 
 
     def update_control(self):
-        # just have to update this self.flat_output with the queried flat outputs
-        self.flat_output['x'] = [] 
-        self.flat_output['x_dot'] = [] 
+        x_dot = self.lpvds.evaluate_lpv_ds(self.state['x'])
+        self.flat_output['x'] =  self.state['x']
+        self.flat_output['x_dot'] = x_dot
         self.flat_output['x_ddot'] = [0, 0, 0]
         self.flat_output['x_dddot'] = [0, 0, 0]
         self.flat_output['x_ddddot'] = [0, 0, 0]
