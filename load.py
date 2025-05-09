@@ -4,6 +4,42 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+
+
+def reparameterize_trajectory(array, ratio = 0.7):
+
+
+
+    # reparameter the velocity to make the final velocity to be 0, and it should be kinda smooth
+
+    # Extract velocity components
+    new_vel_x = array[:, 2]
+    new_vel_y = array[:, 3]
+
+    # Number of steps
+    n = int(len(new_vel_x) * ratio)
+
+    print("n: ", n)
+    print("length of new_vel_x: ", len(new_vel_x))
+
+    # Create a taper function that starts at 1 and goes to 0 linearly
+    taper = np.linspace(1, 0, len(new_vel_x) - n)
+
+    new_vel_x[n: ] = new_vel_x[n:] * taper
+    new_vel_y[n: ] = new_vel_y[n:] * taper
+
+    # If needed, update the array
+    array[:, 2] = new_vel_x
+    array[:, 3] = new_vel_y
+
+
+    return array
+
+
+
+
+
+
 def process(bag_name):
 
     bag_path = './bag/' + bag_name + '.bag'
@@ -45,35 +81,33 @@ def process(bag_name):
     # Convert to NumPy array
     array = np.array(data)
 
-    if bag_name == "1":
-
-        #cut half of the data, keep the first half
-        array = array[:array.shape[0] // 2]
-
-
-        # reparameter the velocity to make the final velocity to be 0, and it should be kinda smooth
-
-        new_vel_x = np.zeros(array.shape[0])
-    
-    if bag_name == "circle_twice":
-
-        #cut half of the data, keep the 40% of the data
-        array = array[:int(array.shape[0] * 0.4)]
-        
-
-
-
-
     num_msgs = array.shape[0]
-    start_idx = int(0.01 * num_msgs)
-    end_idx = int(0.99 * num_msgs)
+    start_idx = int(0.05 * num_msgs)
+    end_idx = int(0.95 * num_msgs)
     array = array[start_idx:end_idx]
     # Print shape and optionally preview
     print("Shape of result array:", array.shape)
     print("First 5 rows:\n", array[:5])
 
-    
 
+
+
+
+    if bag_name == "first_flight":
+
+        print("Processing first_flight bag file")
+        print("length of array: ", len(array))
+
+        #cut half of the data, keep the last half
+        array = array[array.shape[0] // 2: int(array.shape[0] * 0.9)]
+
+    if bag_name == "circle_twice":
+
+        #cut half of the data, keep the 40% of the data
+        array = array[:int(array.shape[0] * 0.4)]
+        
+    
+    array = reparameterize_trajectory(array, ratio = 0.8)
 
 
 
@@ -85,7 +119,7 @@ def process(bag_name):
 
     # Plot
     plt.figure(figsize=(5, 6))
-    plt.title("Trajectory with Velocity Vectors")
+    plt.title("Trajectory: " + bag_name)
     plt.xlabel("X1")
     plt.ylabel("X2")
 
