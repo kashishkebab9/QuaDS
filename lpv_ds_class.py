@@ -9,6 +9,10 @@ class LPV_DS_Model:
         # what is inside the mat file
         #print(self.mat_data.keys())
 
+        self.mat_path = mat_path
+
+        self.mat_name = mat_path.split('/')[-1].split('.')[0]
+
         self._load_gmm()
         self._load_lpv_ds()
 
@@ -87,8 +91,13 @@ class LPV_DS_Model:
         import matplotlib.pyplot as plt
 
         # Create a grid of points
-        x_vals = np.linspace(-2, 2, 20)
-        y_vals = np.linspace(-10, 10, 200)
+        map_range = [[-4, 4], [0, 10]]
+
+        x_min, x_max = map_range[0]
+        y_min, y_max = map_range[1]
+
+        x_vals = np.linspace(x_min, x_max, 5 * (x_max - x_min))
+        y_vals = np.linspace(y_min, y_max, 5 * (y_max - y_min))
         X, Y = np.meshgrid(x_vals, y_vals)
 
         U = np.zeros_like(X)
@@ -103,13 +112,25 @@ class LPV_DS_Model:
                 V[i, j] = x_dot[1, 0]
 
         # Plot the streamlines
-        plt.figure(figsize=(6, 6))
+        plt.figure(figsize=(5, 6))
         plt.streamplot(X, Y, U, V, color='black', linewidth=1)
 
         #plot the xi_ref
         for i in range(self.Xi_ref.shape[1]):
             xi_ref = self.Xi_ref[:, i]
-            plt.plot(xi_ref[0], xi_ref[1], 'bo', markersize=2)
+            plt.plot(xi_ref[0], xi_ref[1], 'ro', markersize=2)
+
+
+        # plot the trajectory using the LPV-DS
+        xi_actual = np.array([[self.Xi_ref[0, 0]], [self.Xi_ref[1, 0]]])
+
+        print("xi_actual", xi_actual)
+
+        for i in range(self.Xi_ref.shape[1]):
+            x_dot = self.evaluate_lpv_ds(xi_actual)
+            xi_actual = xi_actual + 0.1 * x_dot
+            plt.plot(xi_actual[0], xi_actual[1], 'ko', markersize=4)
+
 
         # Axis labels with LaTeX
         plt.xlabel(r'$x_1$', fontsize=18)
@@ -118,7 +139,16 @@ class LPV_DS_Model:
 
         plt.gca().set_aspect('equal', adjustable='box')
         plt.grid(False)
-        plt.show()
+        
+        #save this image
+        folder = './img/'
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+        plt.savefig(folder + self.mat_name + '_streamplot.png', dpi=300)
+
+
+
+        #plt.show()
 
 
     def visualize_vector_field_with_trajectories(self, initial_conditions, goal):
@@ -127,8 +157,14 @@ class LPV_DS_Model:
         from scipy.integrate import solve_ivp
 
         # Grid for streamplot
-        x_vals = np.linspace(-5, 5, 20)
-        y_vals = np.linspace(-5, 10, 40)
+        map_range = [[-5, 5], [-5, 10]]
+        x_min, x_max = map_range[0]
+        y_min, y_max = map_range[1]
+
+
+
+        x_vals = np.linspace(x_min, x_max, 40)
+        y_vals = np.linspace(y_min, y_max, 40)
         X, Y = np.meshgrid(x_vals, y_vals)
 
         U = np.zeros_like(X)
@@ -164,12 +200,17 @@ class LPV_DS_Model:
 
         for i in range(self.Xi_ref.shape[1]):
             xi_ref = self.Xi_ref[:, i]
-            print("xi_ref", xi_ref)
+            #print("xi_ref", xi_ref)
             ax.plot(xi_ref[0], xi_ref[1], 'bo', markersize=2)
 
 
         # Plot goal point
         ax.plot(goal[0], goal[1], 'yo', markersize=12)
+
+        # Axis limits
+        ax.set_xlim(x_min, x_max)
+        ax.set_ylim(y_min, y_max)
+
 
         ax.set_title("Vector Field and Trajectory", fontsize=14)
         ax.set_xlabel("X", fontsize=12)
@@ -180,14 +221,36 @@ class LPV_DS_Model:
 
 # === Example usage ===
 if __name__ == "__main__":
-    model = LPV_DS_Model('./gmm.mat')
+
+
+    folder_path = "./gmm_mat_data/Velocity Decrease Data/"
+
+    # traverse all files in the folder
+    import os
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".mat"):
+            print("The file is ", filename)
+            # Load the LPV-DS model
+            model = LPV_DS_Model(folder_path + filename)
+
+            # Compare responsibilities and LPV-DS outputs
+            model.visualize_lpv_streamplot()
+        else:
+            print("The file is not a .mat file")
+
+
+
+
+
+
+    #model = LPV_DS_Model('./gmm.mat')
     # model.compare_responsibilities()
     # model.compare_lpv_ds()
 
-    model.visualize_lpv_streamplot()
+    #model.visualize_lpv_streamplot()
 
-    initial_conditions = [[-1, -1], [0, 0], [1, 1]]
-    goal = [2, 2]
-    model.visualize_vector_field_with_trajectories(initial_conditions, goal)
+    # initial_conditions = [[-1, -1], [0, 0], [1, 1]]
+    # goal = [2, 2]
+    # model.visualize_vector_field_with_trajectories(initial_conditions, goal)
     
 

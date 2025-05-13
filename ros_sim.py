@@ -113,7 +113,7 @@ class LPVDS_ROS_Node:
 
 if __name__ == '__main__':
 
-    gmm_path = "gmm_mat_data/gmm_trajectory_dataline_backward.mat"
+    gmm_path = "gmm_mat_data/Velocity Decrease Data/gmm_trajectory_datafirst_forward.mat"
     if not gmm_path.endswith('.mat'):
         raise ValueError("The provided file is not a .mat file.")
 
