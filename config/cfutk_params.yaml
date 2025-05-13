@@ -1,0 +1,7 @@
+kp_yaw_rate: 0.1
+c1: -58.4908
+c2: 1.336
+c3: 1918.217
+so3_cmd_timeout: 0.1
+thrust_pwm_max: 62000
+thrust_pwm_min: 15000

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="mav_name" default="crazy02"/>
+    <group ns="$(arg mav_name)">
+        <node pkg="rotorpy_hardware" type="controller_node.py" name="controller_node" output="screen">
+            <remap from="odom" to="odom"/>
+            <remap from="cmd" to="so3cmd_to_crazyflie/cmd_vel_fast"/>
+            <remap from="flat_outputs" to="flat_outputs"/>
+        </node>
+    </group>
+
+    <include file="$(find rotorpy_hardware)/launch/bagging.launch">
+        <arg name="mav_name" value="$(arg mav_name)" />
+    </include>
+
+</launch>

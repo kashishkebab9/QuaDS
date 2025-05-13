@@ -7,7 +7,7 @@ class LPV_DS_Model:
     def __init__(self, mat_path):
         self.mat_data = loadmat(mat_path)
         # what is inside the mat file
-        #print(self.mat_data.keys())
+        # print(self.mat_data.keys())
 
         self.mat_path = mat_path
 
@@ -85,6 +85,31 @@ class LPV_DS_Model:
         print("Python x_dot:", x_dot_python)
         print("Difference:", np.abs(self.x_dot_matlab - x_dot_python))
 
+    
+    def visualize_lpv_ds(self):
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D
+
+        fig = plt.figure()
+        
+        # sample some data points x. and compute x_dot
+
+        range_x = np.linspace(-5, 5, 100)
+        range_y = np.linspace(-20, 20, 100)
+
+        for i in range(len(range_x)):
+            for j in range(len(range_y)):
+                x = np.array([[range_x[i]], [range_y[j]]])
+                x_dot = self.evaluate_lpv_ds(x)
+                plt.quiver(x[0], x[1], x_dot[0], x_dot[1], angles='xy', scale_units='xy', scale=1, color='r')
+        plt.xlim(-5, 5)
+        plt.ylim(-20, 20)
+        plt.xlabel('x1')
+        plt.ylabel('x2')
+        plt.title('LPV-DS Vector Field')
+        plt.grid()
+        plt.show()
+
 
     def visualize_lpv_streamplot(self):
         import numpy as np
@@ -115,6 +140,7 @@ class LPV_DS_Model:
         plt.figure(figsize=(5, 6))
         plt.streamplot(X, Y, U, V, color='black', linewidth=1)
 
+<<<<<<< HEAD
         #plot the xi_ref
         for i in range(self.Xi_ref.shape[1]):
             xi_ref = self.Xi_ref[:, i]
@@ -132,6 +158,8 @@ class LPV_DS_Model:
             plt.plot(xi_actual[0], xi_actual[1], 'ko', markersize=4)
 
 
+=======
+>>>>>>> 1de96684a953254dd656829261a548fddf4e7102
         # Axis labels with LaTeX
         plt.xlabel(r'$x_1$', fontsize=18)
         plt.ylabel(r'$x_2$', fontsize=18)
@@ -219,8 +247,11 @@ class LPV_DS_Model:
         plt.show()
 
 
+
+
 # === Example usage ===
 if __name__ == "__main__":
+<<<<<<< HEAD
 
 
     folder_path = "./gmm_mat_data/Velocity Decrease Data/"
@@ -248,6 +279,15 @@ if __name__ == "__main__":
     # model.compare_lpv_ds()
 
     #model.visualize_lpv_streamplot()
+=======
+    model = LPV_DS_Model('./gmm_trajectory_datacircle_twice.mat')
+    # model.compare_responsibilities()
+    # model.compare_lpv_ds()
+
+    print(np.zeros((3,)))
+
+    model.visualize_lpv_streamplot()
+>>>>>>> 1de96684a953254dd656829261a548fddf4e7102
 
     # initial_conditions = [[-1, -1], [0, 0], [1, 1]]
     # goal = [2, 2]
