@@ -1,0 +1,12 @@
+gains:
+  pos: {x: 6.0, y: 6.0, z: 10.0}
+  vel: {x: 3.0, y: 3.0, z: 10.0}
+  ki:  {x: 0.1, y: 0.1, z: 0.2}
+  kib: {x: 0.1, y: 0.1, z: 0.1}
+  rot: {x: .25, y: .25, z: .0002}
+  ang: {x: 0.01, y: 0.01, z: 0.0001}
+
+
+max_pos_int: 2.6
+max_pos_int_b: 2.6
+max_tilt_angle: 3.14

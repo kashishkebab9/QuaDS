@@ -1,0 +1,12 @@
+<launch>
+    <arg name="mav_name"/>
+    <node pkg="rosbag" type="record" name="bagging" 
+    args="/tf /tf_static /obj_triangles
+    $(arg mav_name)/so3cmd_to_crazyflie/cmd_vel_fast
+    $(arg mav_name)/odom 
+    $(arg mav_name)/imu 
+    $(arg mav_name)/extended_so3_cmd 
+    $(arg mav_name)/lidar_raycast
+    $(arg mav_name)/battery
+    -o  $(find rotorpy_hardware)/bags/"> </node>
+</launch>

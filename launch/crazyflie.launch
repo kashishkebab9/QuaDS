@@ -1,0 +1,57 @@
+<launch>
+
+  <arg name="mav_name"/>
+  <arg name="mav_type" default="crazyflie"/>
+  <arg name="config_path"/>
+  <arg name="thrust_config_file"/>
+  <arg name="gains_config_file"/>
+  <arg name="uri"/>
+  <arg name="cmd_frequency" default="100"/>
+  <arg name="mass" default="0.034"/>
+  <arg name="nodelet_manager_name" default="nodelet_manager_control"/>
+
+  <group ns="$(arg mav_name)">
+    <param name="mass" value="$(arg mass)"/>
+
+    <!-- KR MAV CONTROL -->
+    <include file="$(find rotorpy_hardware)/launch/quadrotor_control.launch">
+      <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
+      <arg name="mass" value="$(arg mass)"/>
+      <arg name="config_path" value="$(arg config_path)"/>
+      <arg name="thrust_config_file" value="$(arg thrust_config_file)"/>
+      <arg name="gains_config_file" value="$(arg gains_config_file)"/>
+    </include>
+
+    <node pkg="crazyflie_driver" type="crazyflie_add" name="crazyflie_add" output="screen">
+        <arg name="uri" value="$(arg uri)" />
+        <arg name="tf_prefix" value="$(arg mav_name)" />
+        <rosparam>
+          genericLogTopics: ["log_power"]
+          genericLogTopicFrequencies: [10]
+          genericLogTopic_log_power_Variables: ["ina260.voltage", "ina260.power"]
+        </rosparam>
+        <arg name="enable_logging" value="True" />
+    </node>
+
+    <node pkg="nodelet"
+        type="nodelet"
+        args="load kr_crazyflie_interface/SO3CmdToCrazyflie $(arg nodelet_manager_name)"
+        name="so3cmd_to_crazyflie"
+        required="true"
+        clear_params="true"
+        output="screen">
+        <remap from="~odom" to="odom"/>
+        <remap from="~so3_cmd" to="so3_cmd"/>
+        <remap from="~cmd_vel" to="cmd_vel"/>
+        <rosparam file="$(arg config_path)/$(arg thrust_config_file)"/>
+        <param name="mav_name" value="$(arg mav_name)"/>
+        <param name="so3_cmd_timeout" value="100000000"/>
+    </node>
+
+    <node name="cmd_vel_throttler"
+      type="throttle"
+      pkg="topic_tools"
+      args="messages /$(arg mav_name)/so3cmd_to_crazyflie/cmd_vel_fast $(arg cmd_frequency) /$(arg mav_name)/cmd_vel" />
+  </group>
+  
+</launch>
